@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { FaGoogle, FaGithub } from 'react-icons/fa';
 import Link from 'next/link';
 
 export default function RegisterPage() {
@@ -14,67 +16,62 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
-
     const data = await res.json();
     setLoading(false);
-
-    if (!res.ok) {
-      setError(data.error);
-    } else {
-      router.push('/signIn');
-    }
+    if (!res.ok) setError(data.error);
+    else router.push('/signIn');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl text-gray-800 font-bold mb-6 text-center">Registro</h1>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+      <div className="glass" style={{ width: '100%', maxWidth: '400px', padding: '40px 36px' }}>
 
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: '14px',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px', fontSize: 22
+          }}>✨</div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>Crear cuenta</h1>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Únete hoy, es gratis</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            className="border rounded px-3 py-2 text-sm text-gray-800"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={e => setForm({ ...form, email: e.target.value })}
-            className="border rounded px-3 py-2 text-sm text-gray-800"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={form.password}
-            onChange={e => setForm({ ...form, password: e.target.value })}
-            className="border rounded px-3 py-2 text-sm text-gray-800"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-          >
-            {loading ? 'Registrando...' : 'Registrarse'}
+        {error && <div className="error-msg">{error}</div>}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+          <input className="glass-input" type="text" placeholder="Nombre completo"
+            value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+          <input className="glass-input" type="email" placeholder="Correo electrónico"
+            value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+          <input className="glass-input" type="password" placeholder="Contraseña"
+            value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
+          <button className="btn-primary" type="submit" disabled={loading} style={{ marginTop: 4 }}>
+            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4 text-gray-600">
+        <div className="divider">o regístrate con</div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="btn-social" onClick={() => signIn('google', { callbackUrl: '/dashboard' })}>
+            <FaGoogle size={15} /> Continuar con Google
+          </button>
+          <button className="btn-social" onClick={() => signIn('github', { callbackUrl: '/dashboard' })}>
+            <FaGithub size={15} /> Continuar con GitHub
+          </button>
+        </div>
+
+        <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 24 }}>
           ¿Ya tienes cuenta?{' '}
-          <Link href="/signIn" className="text-blue-600 hover:underline">Inicia sesión</Link>
+          <Link href="/signIn" style={{ color: '#a78bfa', textDecoration: 'none', fontWeight: 500 }}>
+            Inicia sesión
+          </Link>
         </p>
       </div>
     </div>
